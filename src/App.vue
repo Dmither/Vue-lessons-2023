@@ -1,17 +1,17 @@
 <script setup>
 import { ref } from 'vue';
-import { reactive } from 'vue';
 
-const message = ref("Hello, World")
+const obj = ref({
+  nasted: {count: 0},
+  arr: ["foo", "bar"],
+});
 
-console.log(message)
-console.log(message.value)
-message.value = "Changed"
-
-console.log(message.value)
+function mutateDeeply() {
+  obj.value.nasted.count++
+}
 
 </script>
 
 <template>
-  <h1>Hello, Vue World!</h1>
+  <button @click="mutateDeeply">{{ obj.nasted.count }}</button>
 </template>
