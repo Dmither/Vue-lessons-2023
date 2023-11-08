@@ -1,18 +1,25 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, watch, watchEffect } from 'vue';
 
-const text1 = ref("");
-const text2 = ref("");
+import Home from './components/Home.vue';
+import Posts from './components/Posts.vue';
+import Archive from './components/Archive.vue';
 
-onMounted(() => {
-  console.log(`Now the component has mounted`)
-})
+const currentTab = ref("Home")
 
+const tabs = {
+  "Home": Home,
+  "Posts": Posts,
+  "Archive": Archive
+}
 </script>
 
-<template>
-  <p>Input1: {{ text1 }}</p>
-  <input type="text" v-model="text1">
-  <p>Input2: {{ text2 }}</p>
-  <input type="text" v-model.lazy="text2">
+<template class="template">
+  <div>
+    <button v-for="(tab, label) in tabs" :key="label" @click="currentTab = label">
+      {{ label }}
+    </button>
+    <component :is="tabs[currentTab]"></component>
+  </div>
 </template>
+
