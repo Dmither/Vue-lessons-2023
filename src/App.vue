@@ -1,25 +1,18 @@
 <script setup>
-import { ref, reactive, computed, onMounted, watch, watchEffect } from 'vue';
+import { ref, computed } from 'vue';
+import CustomInput from './components/CustomInput.vue';
+const firstName = ref("");
+const lastName = ref("");
 
-import Home from './components/Home.vue';
-import Posts from './components/Posts.vue';
-import Archive from './components/Archive.vue';
-
-const currentTab = ref("Home")
-
-const tabs = {
-  "Home": Home,
-  "Posts": Posts,
-  "Archive": Archive
-}
+const fullName = computed(() => {
+  return `${firstName.value} ${lastName.value}`
+})
 </script>
 
 <template class="template">
   <div>
-    <button v-for="(tab, label) in tabs" :key="label" @click="currentTab = label">
-      {{ label }}
-    </button>
-    <component :is="tabs[currentTab]"></component>
+    <CustomInput v-model:firstName.capitalize="firstName" v-model:lastName.upperCase="lastName"/>
+    <p>{{ fullName }}</p>
   </div>
 </template>
 
