@@ -104,14 +104,16 @@ console.log(count.value); // 0
 
 При використанні SFC можна спростити використання за допомогою `<script setup>`:
 
-```js
+```html
 <script setup>
 	import { ref } from "vue";
-	const count = ref(0)
-	function increment() {count.value++}
+	const count = ref(0);
+	function increment() {
+		count.value++;
+	}
 </script>
 <template>
-	<button @click="increment"> {{ count }} </button>
+	<button @click="increment">{{ count }}</button>
 </template>
 ```
 
@@ -125,9 +127,9 @@ console.log(count.value); // 0
 
 Інший спосіб оголосити реактивний стан - функція `reactive()`, робить сам об'єкт реактивним.
 
-```js
+```html
 <script setup>
-	import { reactive } from 'vue';
+	import { reactive } from "vue";
 	const state = reactive({ count: 0 });
 </script>
 <template>
@@ -147,18 +149,24 @@ API `reactive()` працює лише для об'єктів, вимагає з
 
 Вбудовані в шаблони вирази досить зручні для простих разових дій. Більш складні дії з великою кількістю логічних операцій краще обробляти за допомогою **обчислювальних властивостей**. Ф-я `computed()` повертає обчислювальну референцію. Доступ до обчислювального результату через `.value`, автоматично розпаковується всередині шаблона. Обчислювальна властивість автоматично відстежує свої реактивні залежності.
 
-```js
+```html
 <script setup>
-	import { reactive, computed } from 'vue';
+	import { reactive, computed } from "vue";
 	const author = reactive({
 		name: "John",
-		books: ["BookName1", "BookName2"]
-	})
-	const publishedBooksMessage = computed(() => author.books.length > 0 ? "Yes" : "No")
-	function getMessage() {return publishedBooksMessage.value}
+		books: ["BookName1", "BookName2"],
+	});
+	const publishedBooksMessage = computed(() =>
+		author.books.length > 0 ? "Yes" : "No"
+	);
+	function getMessage() {
+		return publishedBooksMessage.value;
+	}
 </script>
 <template>
-	<p>Has published books: <span> {{ publishedBooksMessage }}</span></p>
+	<p>
+		Has published books: <span> {{ publishedBooksMessage }}</span>
+	</p>
 </template>
 ```
 
@@ -187,21 +195,16 @@ const fullName = computed({
 
 ```html
 <div :class="{ active: isActive }"></div>
-Клас "active" буде автоматично призначений при (isActive === true)
-
+<!-- Клас "active" буде автоматично призначений при (isActive === true) -->
 <div
 	class="static"
 	:class="{ active: isActive, 'text-danger': hasError }"
 ></div>
-Також можна визначити декілька класів як поля в об'єкті, разом зі
-звичайним класом
-
+<!-- Також можна визначити декілька класів як поля в об'єкті, разом зі звичайним класом -->
 <div :class="classObject"></div>
-Замість визначення напряму в шаблоні може бути переданий визначений
-реактивний клас
-
+<!-- Замість визначення напряму в шаблоні може бути переданий визначений реактивний клас -->
 <div :class="[activeClass, errorClass]"></div>
-Значення класів може бути передано масивами
+<!-- Значення класів може бути передано масивами -->
 ```
 
 Поширена і потужна модель - прив'язувати обчислювальні властивості, які повертають об'єкт:
@@ -545,8 +548,10 @@ app.component("ComponentA", ComponentA);
 
 **Локальна реєстрація** поширює доступність зареєстрованих компонентів лише для поточного компонента. При використанні SFC з script setup, імпортовані компоненти використовуються локально **без реєстрації**; без script setup потрібно використовувати пораметр **components**. Локально зареєстровані компоненти доступні лише для поточного компонента але не для його нащадків.
 
-```js
-<script setup>import ComponentA from './ComponentA.vue'</script>
+```html
+<script setup>
+	import ComponentA from "./ComponentA.vue";
+</script>
 ```
 
 ```js
@@ -710,17 +715,29 @@ const emit = defineEmits({
 
 ```html
 <UserName
-  v-model:first-name.capitalize="first"
-  v-model:last-name.uppercase="last"
+	v-model:first-name.capitalize="first"
+	v-model:last-name.uppercase="last"
 />
 ```
 
 ```js
 const props = defineProps({
-  firstName: String,
-  lastName: String,
-  firstNameModifiers: { default: () => ({}) },
-  lastNameModifiers: { default: () => ({}) }
-})
-defineEmits(['update:firstName', 'update:lastName'])
+	firstName: String,
+	lastName: String,
+	firstNameModifiers: { default: () => ({}) },
+	lastNameModifiers: { default: () => ({}) },
+});
+defineEmits(["update:firstName", "update:lastName"]);
+```
+
+### Прохідні атрибути
+**Прохідний атрибут** - атрибут або слухач подій, який передається компоненту але не оголошується явно в реквізитах або випромінюваннях приймаючого компонента. Типові приклади - атрибути class, style, id тощо. Коли компонент рендерить один корневий елемент, прохідні атрибути автоматично додаються до атрибутів корневого елемента. Прохідний атрибут class або style зливається з наявним. Слухачі подій також додаються до корневого елемента, при наявності викликаються обидва.
+
+```html
+<!-- App.vue -->
+<MyButton class="large" />
+<!-- MyButton.vue -->
+<button class="btn">Push</button>
+<!-- render -->
+<button class="btn large">Push</button>
 ```
