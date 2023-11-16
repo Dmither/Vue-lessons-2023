@@ -1,19 +1,13 @@
 <script setup>
-import { useAttrs } from 'vue';
+import { useAttrs, inject } from 'vue';
 
+const val = inject("key")
+console.log(val.value)
 
 </script>
 
 <template>
-  <header>
-    <slot name="header" />
-  </header>
-  <main>
-    <slot></slot>
-  </main>
-  <footer>
-    <slot name="footer" />
-  </footer>
+  
 </template>
 
 

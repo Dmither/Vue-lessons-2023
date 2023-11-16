@@ -790,3 +790,39 @@ const attrs = useAttrs();
 **Обмежені слоти**
 
 ### Provide / inject
+
+Надати реквізити дочірнім компонентам глибоко в ланцюгу без їх прокидання можна за допомогою `provide` і `inject`, викликаються **синхронно** в script setup або setup().
+
+Функція `provide()` отримує: ключ введення (рядок або Symbol) та надане значення. Значення надання на рівні програми `app.provide(key, val)` доступне для всіх її компонентів.
+
+Вводяться данні за допомогою `inject()`. Приймає ключ провайдера, опціонально стандартне значення і чи є воно фабричною ф-єю.
+
+```js
+// Provider.vue
+const message = ref("Hello!");
+provide("message", message);
+// Receiver.vue
+const message = inject("message");
+console.log(message.value);
+```
+
+Реактивне значення встановлює **реактивне** з'єднання з провайдером. Мутації рекомендовано зберігати всередині провайдера та надавати надавати приймачу функції для змін.
+
+```js
+// Provider.vue
+const direction = ref("North");
+function updateLocation(newValue) {
+	direction.value = newValue;
+}
+provide("location", {
+	location,
+	updateLocation,
+});
+// Receiver.vue
+const { location, updateLocation } = inject("location");
+```
+
+При роботі з багатьма залежними провайдерами або компонентами для інших розробників рекомендовано використовувати символьні ключі, експортовані в окремий файл.
+
+### Асинхронні компоненти
+

@@ -1,18 +1,14 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, provide } from 'vue';
 import MyComponent from './components/MyComponent.vue';
+
+const val = ref(0);
+provide('key', val);
+console.log(val)
 
 </script>
 
 <template>
-  <MyComponent>
-    <template v-slot:header>
-      Header
-    </template>
-    Body
-    <template #footer>
-      Footer
-    </template>
-  </MyComponent>
+  <MyComponent></MyComponent>
 </template>
 
