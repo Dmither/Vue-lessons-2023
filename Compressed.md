@@ -1,5 +1,7 @@
 # Vue 3 cheatsheet
 
+З використанням композиційного API та script setup.
+
 ---
 
 #### Швидкий старт
@@ -59,8 +61,9 @@ const count = ref(0);
 
 Обчислення складної логіки, кількох властивостей.  
 `computed()` повертає обчислену референцію;  
-приймає фабрику або об'єкт з гет і сет.  
-Перераховується при зміні реактивних залежностей.
+приймає фабрику або об'єкт з гет і сет (краще уникати).  
+Перераховується при зміні реактивних залежностей.  
+!!! Без побічних ефектів
 
 ```js
 const fullName = computed(() => name + " " + surname);
@@ -103,3 +106,118 @@ const fullName = computed(() => name + " " + surname);
 ```
 
 #### Обробка подій
+
+Значення може бути вбудованим обробником або методом.  
+Доступ до аргументу події через $event або стрілкову ф-ю.
+
+```html
+<button v-on:click="count++">Increase</button>
+<button @click="count++">Increase</button>
+<button @click="handler">Increase</button>
+<button @click="handler, $event">Increase</button>
+<button @click="(e) => handler(e)">Increase</button>
+<button @click.ctrl.left="handler">Increase</button>
+```
+
+Модифікатори:  
+`.stop` викликає eventStopPropagination;  
+`.prevent` викликає event.preventDefault;  
+`.self` спрацьовує лише на собі;  
+`.capture`, `.once`, `.passive` параметри слухача;  
+ключові модифікатори, модифікатори системи, миші тощо.
+
+#### Прив'язування елементів форми
+
+Двостороння прив'язка за властивістю та подією:
+Текстові `input` та `textarea` - `value` та `input`;
+`:checkbox` та `:radio` - `checked` та `change`;
+`select` - `value` та `change`.  
+Початковий стан оголошується на стороні JS.
+
+```html
+<input v-model="message" />
+<input
+	type="checkbox"
+	v-model="isChecked"
+/>
+```
+
+`.lazy` винхронізує після `change` замість `input`;  
+`.number` автоматично перетворює дані в число;
+`.trim` автоматично обрізає пробіли.
+
+#### Хуки життєвоо циклу
+
+Тільки синхронно в setup.  
+`onBeforeMount` перед монтуванням в DOM;  
+`onMounted` вмонтований в DOM, є доступ;  
+`onBeforeUpdate` реактивна зміна даних;  
+`onUpdated` оновлений в DOM;  
+`onBeforeUnmount` ще доступний перед демонтуванням;  
+`onUnmounted` демонтування виконано.
+
+#### Спостерігачі
+
+Створення побічних ефектів при зміні стану до оновлення.  
+`watch` приймає реф, реактив, геттер, масив джерел;  
+викликається при першій зміні, з `immediate` негайно.  
+`watchEffect` автоматично відстежує залежності;  
+викликається негайно; може бути ефективніший.  
+Після оновлення: `flush: post` або `watchPostEffect`.  
+Асинхронні спостерігачі необхідно зупиняти.
+
+```js
+const count = ref(0);
+// watch(source, callback, options)
+watch(count, changed => cosnole.log(changed));
+// watchEffect(callback, options)
+watchEffect(() => console.log(count.value));
+```
+
+#### Референції в шаблонах
+
+Пряме посилання на елемент DOM (після монтування).
+
+```js
+// script setup
+const input = ref(null);
+onMounted(() => {
+	input.value.focus();
+});
+// template
+<input ref="input" />;
+```
+
+#### Реєстрація компонентів
+
+Глобально зареєстровані доступні у всьому додатку.
+
+```js
+import { createApp } from "vue";
+import MyComponent from "./MyComponent.vue";
+const app = createApp({});
+app.component("ComponentA", MyComponent);
+```
+
+Локально зареєстровані доступні лише поточному компоненту.
+
+```js
+// script setup
+import MyComponent from "./MyComponent.vue";
+// template
+<MyComponent />
+```
+
+#### Реквізити
+
+Односторонній зв'язок від батьківської до дочірньої властивості.
+
+```js
+// ChildComponent script
+const props = defineProps(["foo"]);
+console.log(props.foo);
+// ParentComponent template
+<ChildComponent foo="textValue" />
+<ChildComponent :foo="varValue" />
+<ChildComponent v-bind="obj" />
+```

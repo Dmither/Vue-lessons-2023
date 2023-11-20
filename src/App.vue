@@ -1,17 +1,22 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 
-const mainClass = ref("active")
+const count = ref(0);
+watch(count, changed => {
+  console.log(`New value is ${changed}`);
+})
 
 </script>
 
 <template>
-  <div :class="mainClass"></div>
+  <button @click="count++">{{ count }}</button>
 </template>
 
 
 <style>
-.wrapper {
-  padding: 15px;
+button {
+  display: block;
+  padding: 10px;
+  margin: 10px;
 }
 </style>
