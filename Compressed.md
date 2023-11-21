@@ -205,12 +205,14 @@ app.component("ComponentA", MyComponent);
 // script setup
 import MyComponent from "./MyComponent.vue";
 // template
-<MyComponent />
+<MyComponent />;
 ```
 
 #### Реквізити
 
-Односторонній зв'язок від батьківської до дочірньої властивості.
+Рекомендований спосіб передачі даних parent -> child.  
+Невід'ємна частина ідентичності компонента.  
+Може встановлюватись синтаксисом об'єкта з перевірками.
 
 ```js
 // ChildComponent script
@@ -220,4 +222,91 @@ console.log(props.foo);
 <ChildComponent foo="textValue" />
 <ChildComponent :foo="varValue" />
 <ChildComponent v-bind="obj" />
+```
+
+#### Події
+
+Дані зберігаються в батьківському компоненті;  
+рекомендований спосіб змінити дані з дочірнього.  
+Додаткові аргументи $emit - аргументи події.  
+При прослуховуванні доступ через стрілку або в метод.
+
+```html
+<!-- ChildComp.vue -->
+<button @click="$emit('someEvent', n)">Press</button>
+<!-- ParentComp.vue -->
+<ChildComp @some-event="increaseCount" />
+<ChildComp @some-event="(n) => count += n" />
+```
+
+Поза шаблоном використовується макрос defineEmits().
+
+```js
+const emit = defineEmits(["inFocus", "submit"]);
+function buttonClick() {
+	emit("submit");
+}
+```
+
+#### v-model з компонентами
+
+Двостороннє прив'язування властивості parent та child.  
+Псевдонім для реквізиту і події, за умовчуванням:  
+реквізит `modelValue` та подія `update:modelValue`.  
+Аргумент дир-ви міняє на `argName` і `update:argName`.
+
+```js
+// script setup
+defineProps(["modelValue"]);
+defineEmits(["update:modelValue"]);
+// template
+<input :value="modelValue"
+@input="$emit('update:modelValue', $event.target.value)"
+/>
+```
+
+```js
+// script setup
+const props = defineProps(["modelValue"]);
+const emit = defineEmits(["update:modelValue"]);
+const value = conputed({
+	get() {
+		return props.modelValue;
+	},
+	set(value) {
+		emit("update:modelValue", value);
+	},
+});
+// template
+<input v-model="value" />
+```
+
+#### Прохідні атрибути
+
+Коли важко передбачити контекст використання.  
+Не оголошений явно в реквізитах або випроміненнях.  
+Типові приклади - атрибути class і style.  
+
+```html
+<!-- ParentComp.vue -->
+<ChildComp class="large" />
+<!-- ChildComp.vue -->
+<button class="btn">Press</button>
+<!-- render -->
+<button class="btn large">Press</button>
+```
+
+#### Слоти
+
+Заміняє слот на переданий вміст.  
+Для кількох слотів елемент template з v-slot.  
+За умовчуванням ім'я default.
+
+```html
+<!-- ParentComp.vue -->
+<ChildComp>Press</ChildComp>
+<!-- ChildComp.vue -->
+<button><slot /></button>
+<!-- render -->
+<button>Press</button>
 ```

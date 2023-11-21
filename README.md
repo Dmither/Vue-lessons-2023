@@ -689,7 +689,7 @@ const emit = defineEmits({
 <template>
 	<input
 		:value="modelValue"
-		@input="$emit('update:modelValue, $event.target.value')"
+		@input="$emit('update:modelValue', $event.target.value)"
 	/>
 </template>
 ```
