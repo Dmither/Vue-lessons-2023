@@ -4,18 +4,18 @@ export function useFetch(url) {
 	const data = ref(null);
 	const error = ref(null);
 
-  function fetchData() {
-    fetch(toValue(url))
-      .then(res => res.json())
-      .then(json => (data.value = json))
-      .catch(err => (error.value = err));
-  }
+	function fetchData() {
+		data.value = null;
+		error.value = null;
+		fetch(toValue(url))
+			.then(res => res.json())
+			.then(json => (data.value = json))
+			.catch(err => (error.value = err));
+	}
 
-  watchEffect(() => {
-    data.value = null;
-    error.value = null;
-    fetchData();
-  })
+	watchEffect(() => {
+		fetchData();
+	});
 
 	return { data, error };
 }

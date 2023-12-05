@@ -871,4 +871,66 @@ const AsyncComp = defineAsyncComponent({
 
 ### Композиційні функції
 
-Композиційна функція використовує композиційний API для інкапсуляції та повторного використання логіки зі станом.
+Композиційна функція використовує композиційний API для інкапсуляції та повторного використання логіки зі станом. Логіку, прописану за допомогою композиційного API можна винести в зовнішній файл як композиційну ф-ю та використовувати в кількох компонентах. Можуть бути вкладені.
+
+```js
+// event.js
+import { onMounted, onUnmounted } from "vue";
+export function useEventListener(target, event, callback) {
+	onMounted(() => target.addEventListener(event, callback));
+	onUnmounted(() => target.removeEventListener(event, callback));
+}
+```
+
+```js
+// mouse.js
+import { ref } from "vue";
+import { useEventListener } from "./event.js";
+export function useMouse() {
+	const x = ref(0);
+	const y = ref(0);
+
+	useEventListener(window, "mousemove", event => {
+		x.value = event.pageX;
+		y.value = event.pageY;
+	});
+
+	return { x, y };
+}
+```
+
+```js
+// script setup
+import { useMouse } from "./mouse.js";
+const { x, y } = useMouse();
+```
+
+За конвенцією назви композиційних ф-й починаються з "use".  
+Вхідні аргументи можуть бути даними, референціями чи геттерами, мають проходити через `toValue()`.  
+Якщо створює реактивні ефекти, явно спостерігати за посиланням/геттером в watch()/watchEffect().  
+Повертати має звичайний нереактивний об'єкт з референціями.  
+Побічні ефекти виконуються в хуках життєвого циклу onMounted, необхідно очищати в onUnmounted.  
+Слід викликати в script setup або setup() синхронно. Можна також викликати в onMounted.  
+Композиційні ф-ї можна витягати не тільки для повторного використання, а й для організації коду.
+
+```js
+import { ref, watchEffect, toValue } from "vue";
+export function useFetch(url) {
+	const data = ref(null);
+	const error = ref(null);
+	function fetchData() {
+		data.value = null;
+		error.value = null;
+		fetch(valueTo(url))
+			.then(res => res.json())
+			.then(json => (data.value = json))
+			.catch(err => (error.value = err));
+	}
+	watchEffect(() => {
+		fetchData();
+	});
+	return { data, error };
+}
+```
+
+### Спеціальні директиви

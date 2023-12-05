@@ -10,6 +10,9 @@ const url = ref(users);
 
 const {data, error} = useFetch(url);
 
+onMounted(() => console.log("first"))
+onMounted(() => console.log("second"))
+
 </script>
 
 <template>
